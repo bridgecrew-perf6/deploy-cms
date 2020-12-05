@@ -1,5 +1,5 @@
 variable "GC_PROJECT_ID" {}
-variable "IMAGE_NAME" {}
+variable "IMAGE" {}
 
 ## Configure GCP project
 provider "google" {
@@ -15,12 +15,12 @@ data "google_secret_manager_secret_version" "database_instance_name" {
 
 ## Deploy image to Cloud Run
 resource "google_cloud_run_service" "website" {
-  name     = "${var.IMAGE_NAME}"
+  name     = "${var.IMAGE}"
   location = var.location
   template {
     spec {
       containers {
-        image = "gcr.io/.${var.GC_PROJECT_ID}/${var.IMAGE_NAME}"
+        image = "gcr.io/.${var.GC_PROJECT_ID}/${var.IMAGE}"
       }
     }
     metadata {
