@@ -58,6 +58,9 @@ jobs:
   provision-with-terraform:
     name: Terraform Plan
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_IMAGE: "${{ secrets.IMAGE_NAME }}"
+      TF_VAR_GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
     steps:
 #      - name: Sleep for 120 seconds
 #        uses: jakejarvis/wait-action@master
