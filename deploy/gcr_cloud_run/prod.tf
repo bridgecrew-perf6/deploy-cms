@@ -1,6 +1,9 @@
+variable "GC_PROJECT_ID" {}
+variable "IMAGE_NAME" {}
+
 ## Configure GCP project
 provider "google" {
-  project = var.GC_PROJECT_ID
+  project = "${var.GC_PROJECT_ID}"
 }
 
 ## Use Google Secret Manager API
@@ -12,12 +15,12 @@ data "google_secret_manager_secret_version" "database_instance_name" {
 
 ## Deploy image to Cloud Run
 resource "google_cloud_run_service" "website" {
-  name     = var.website_name
+  name     = "${var.IMAGE_NAME}"
   location = var.location
   template {
     spec {
       containers {
-        image = var.IMAGE_NAME
+        image = "gcr.io/"."${var.GC_PROJECT_ID}"/"${var.IMAGE_NAME}"
       }
     }
     metadata {

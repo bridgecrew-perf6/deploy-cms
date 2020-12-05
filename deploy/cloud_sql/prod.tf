@@ -1,6 +1,8 @@
+variable "GC_PROJECT_ID" {}
+
 ## Configure GCP project
 provider "google" {
-  project = var.GC_PROJECT_ID
+  project = "${var.GC_PROJECT_ID}"
 }
 
 ## Use Google Secret Manager API for Database User/Password

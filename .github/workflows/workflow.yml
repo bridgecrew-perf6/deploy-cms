@@ -84,4 +84,4 @@ jobs:
         run: terraform plan -var-file deploy/prod.tfvars -out deploy/prod.out deploy/
 
       - name: 'Terraform Apply'
-        run: terraform apply -auto-approve deploy/prod.out
+        run: GC_PROJECT_ID="${{ secrets.GC_PROJECT_ID }}" IMAGE_NAME="$IMAGE" terraform apply -auto-approve deploy/prod.out
