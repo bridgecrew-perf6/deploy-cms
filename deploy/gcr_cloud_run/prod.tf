@@ -20,7 +20,7 @@ resource "google_cloud_run_service" "website" {
   template {
     spec {
       containers {
-        image = "gcr.io/"."${var.GC_PROJECT_ID}"/"${var.IMAGE_NAME}"
+        image = "gcr.io/.${var.GC_PROJECT_ID}/${var.IMAGE_NAME}"
       }
     }
     metadata {
