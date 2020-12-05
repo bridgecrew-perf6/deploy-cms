@@ -1,5 +1,7 @@
 variable "GC_PROJECT_ID" {}
 variable "IMAGE" {}
+variable "region" {}
+variable "location" {}
 
 ## Configure GCP project
 provider "google" {

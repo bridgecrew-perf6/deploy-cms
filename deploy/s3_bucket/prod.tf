@@ -1,3 +1,9 @@
+variable "region" {}
+variable "AWS_ACCESS_KEY_ID" {}
+variable "AWS_SECRET_ACCESS_KEY" {}
+variable "AWS_STORAGE_BUCKET_NAME" {}
+
+
 provider "aws" {
   region = var.region
   access_key = var.AWS_ACCESS_KEY_ID

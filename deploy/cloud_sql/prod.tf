@@ -1,4 +1,5 @@
 variable "GC_PROJECT_ID" {}
+variable "region" {}
 
 ## Configure GCP project
 provider "google" {
