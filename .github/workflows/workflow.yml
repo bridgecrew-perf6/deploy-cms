@@ -38,7 +38,7 @@ jobs:
       with:
         version: '290.0.1'
         project_id: ${{ secrets.GC_PROJECT_ID }}
-        #service_account_key: ${{ secrets.GC_KEY }} 
+        service_account_key: ${{ secrets.GC_KEY }} 
 
     - run: |
         gcloud auth configure-docker
