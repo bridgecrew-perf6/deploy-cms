@@ -23,7 +23,7 @@ resource "google_cloud_run_service" "website" {
     metadata {
       annotations = {
         "autoscaling.knative.dev/maxScale"      = "1000"
-        "run.googleapis.com/cloudsql-instances" = ${var.GC_PROJECT_ID}:${var.region}:data.google_secret_manager_secret_version.database_instance_name.secret_data
+        "run.googleapis.com/cloudsql-instances" = "${var.GC_PROJECT_ID}:${var.region}:${data.google_secret_manager_secret_version.database_instance_name.secret_data}"
         "run.googleapis.com/client-name"        = "terraform"
       }
     }
