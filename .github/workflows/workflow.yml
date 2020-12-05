@@ -78,23 +78,23 @@ jobs:
       - name: 'Terraform Setup'
         uses: hashicorp/setup-terraform@v1
         env:
-          IMAGE: "${{ secrets.IMAGE_NAME }}"
-          GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
+          TF_VAR_IMAGE: "${{ secrets.IMAGE_NAME }}"
+          TF_VAR_GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
 
       - name: 'Terraform Init'
         run: terraform init deploy/
         env:
-          IMAGE: "${{ secrets.IMAGE_NAME }}"
-          GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
+          TF_VAR_IMAGE: "${{ secrets.IMAGE_NAME }}"
+          TF_VAR_GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
 
       - name: 'Terraform Plan'
         run: terraform plan -var-file deploy/prod.tfvars -out deploy/prod.out deploy/
         env:
-          IMAGE: "${{ secrets.IMAGE_NAME }}"
-          GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
+          TF_VAR_IMAGE: "${{ secrets.IMAGE_NAME }}"
+          TF_VAR_GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
 
       - name: 'Terraform Apply'
         run: terraform apply -auto-approve deploy/prod.out
         env:
-          IMAGE: "${{ secrets.IMAGE_NAME }}"
-          GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
+          TF_VAR_IMAGE: "${{ secrets.IMAGE_NAME }}"
+          TF_VAR_GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
