@@ -1,5 +1,3 @@
-variable "GC_PROJECT_ID" {}
-variable "IMAGE" {}
 
 module "s3_bucket" {
   source = "./s3_bucket"
