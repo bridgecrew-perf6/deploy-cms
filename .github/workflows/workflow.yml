@@ -12,7 +12,6 @@ env:
   IMAGE: "${{ secrets.IMAGE_NAME }}"
   REGISTRY_HOSTNAME: gcr.io
   GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
-  REGISTRY_HOSTNAME: gcr.io
 
 
 jobs:
