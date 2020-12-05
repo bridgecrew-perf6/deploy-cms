@@ -1,11 +1,11 @@
 provider "aws" {
   region = var.region
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  access_key = var.AWS_ACCESS_KEY_ID
+  secret_key = var.AWS_SECRET_ACCESS_KEY
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket = var.aws_bucket_name
+  bucket = var.AWS_STORAGE_BUCKET_NAME
   acl = "public-read-write"
   force_destroy = true
   cors_rule {
@@ -23,8 +23,8 @@ resource "aws_s3_bucket" "bucket" {
     "Principal": "*",
     "Action":["s3:GetObject"],
     "Resource":[
-      "arn:aws:s3:::".${var.aws_bucket_name},
-      "arn:aws:s3:::".${var.aws_bucket_name}."/*"
+      "arn:aws:s3:::".${var.AWS_STORAGE_BUCKET_NAME},
+      "arn:aws:s3:::".${var.AWS_STORAGE_BUCKET_NAME}."/*"
     ]
   }]
 }

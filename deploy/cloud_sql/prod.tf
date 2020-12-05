@@ -1,6 +1,6 @@
 ## Configure GCP project
 provider "google" {
-  project = var.project_id
+  project = var.GC_PROJECT_ID
 }
 
 ## Use Google Secret Manager API for Database User/Password

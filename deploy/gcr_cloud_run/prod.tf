@@ -1,6 +1,6 @@
 ## Configure GCP project
 provider "google" {
-  project = var.project_id
+  project = var.GC_PROJECT_ID
 }
 
 ## Use Google Secret Manager API
@@ -17,13 +17,13 @@ resource "google_cloud_run_service" "website" {
   template {
     spec {
       containers {
-        image = var.gcr_image
+        image = var.IMAGE_NAME
       }
     }
     metadata {
       annotations = {
         "autoscaling.knative.dev/maxScale"      = "1000"
-        "run.googleapis.com/cloudsql-instances" = ${var.project_id}:${var.region}:data.google_secret_manager_secret_version.database_instance_name.secret_data
+        "run.googleapis.com/cloudsql-instances" = ${var.GC_PROJECT_ID}:${var.region}:data.google_secret_manager_secret_version.database_instance_name.secret_data
         "run.googleapis.com/client-name"        = "terraform"
       }
     }

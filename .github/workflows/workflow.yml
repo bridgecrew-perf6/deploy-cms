@@ -26,60 +26,62 @@ jobs:
 #        slack-channel: ${{ secrets.SLACK_CHANNEL }}
 #        slack-text: "A new deployment workflow has been triggered by Github Actions."
 
-  build-and-publish-to-gcr:
-    name: Setup, Build, and Publish
+#  build-and-publish-to-gcr:
+#    name: Setup, Build, and Publish
+#    runs-on: ubuntu-latest
+#    steps:
+
+#    - name: Checkout
+#      uses: actions/checkout@v2
+
+#    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+#      with:
+#        version: '290.0.1'
+#        project_id: "${{ secrets.GC_PROJECT_ID }}"
+#        service_account_key: "${{ secrets.GC_KEY }}" 
+
+#    - run: |
+#        gcloud auth configure-docker
+
+#    - name: Build
+#      run: |
+#        docker build --build-arg DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" --build-arg DJANGO_DB_HOST="${{ secrets.DJANGO_DB_HOST }}" --build-arg DJANGO_DB_NAME="${{ secrets.DJANGO_DB_NAME }}" --build-arg DJANGO_DB_USER="${{ secrets.DJANGO_DB_USER }}" --build-arg DJANGO_DB_PASSWORD="${{ secrets.DJANGO_DB_PASSWORD }}" --build-arg DJANGO_DB_PORT="${{ secrets.DJANGO_DB_PORT }}" --build-arg AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" --build-arg AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" --build-arg AWS_STORAGE_BUCKET_NAME="${{ secrets.AWS_STORAGE_BUCKET_NAME }}" --build-arg AWS_S3_CUSTOM_DOMAIN="${{ secrets.AWS_S3_CUSTOM_DOMAIN }}" -t "$REGISTRY_HOSTNAME"/"${{ secrets.GC_PROJECT_ID }}"/"$IMAGE":"$TAG" ./website/#
+
+#    - name: Publish
+#      run: |
+#        docker push "$REGISTRY_HOSTNAME"/"${{ secrets.GC_PROJECT_ID }}"/"$IMAGE":"$TAG"
+
+
+  provision-with-terraform:
+    name: Terraform Plan
     runs-on: ubuntu-latest
     steps:
-
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-      with:
-        version: '290.0.1'
-        project_id: "${{ secrets.GC_PROJECT_ID }}"
-        service_account_key: "${{ secrets.GC_KEY }}" 
-
-    - run: |
-        gcloud auth configure-docker
-
-    - name: Build
-      run: |
-        docker build --build-arg DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" --build-arg DJANGO_DB_HOST="${{ secrets.DJANGO_DB_HOST }}" --build-arg DJANGO_DB_NAME="${{ secrets.DJANGO_DB_NAME }}" --build-arg DJANGO_DB_USER="${{ secrets.DJANGO_DB_USER }}" --build-arg DJANGO_DB_PASSWORD="${{ secrets.DJANGO_DB_PASSWORD }}" --build-arg DJANGO_DB_PORT="${{ secrets.DJANGO_DB_PORT }}" --build-arg AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" --build-arg AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" --build-arg AWS_STORAGE_BUCKET_NAME="${{ secrets.AWS_STORAGE_BUCKET_NAME }}" --build-arg AWS_S3_CUSTOM_DOMAIN="${{ secrets.AWS_S3_CUSTOM_DOMAIN }}" -t "$REGISTRY_HOSTNAME"/"${{ secrets.GC_PROJECT_ID }}"/"$IMAGE":"$TAG" ./website/
-
-    - name: Publish
-      run: |
-        docker push "$REGISTRY_HOSTNAME"/"${{ secrets.GC_PROJECT_ID }}"/"$IMAGE":"$TAG"
-
-
-#  provision-with-terraform:
-#    name: Terraform Plan
-#    runs-on: ubuntu-latest
-
-#    steps:
 #      - name: Sleep for 120 seconds
 #        uses: jakejarvis/wait-action@master
 #        with:
 #          time: '120s'
 
-#      - name: 'Checkout'
-#        uses: actions/checkout@v2
+      - name: 'Checkout'
+        uses: actions/checkout@v2
 
-#      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-#        with:
-#          version: '290.0.1'
-#          project_id: ${{ secrets.GCR_PROJECT_ID }}
-#          service_account_key: ${{ secrets.GCR_KEY }}
-#          export_default_credentials: true
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '290.0.1'
+          project_id: "${{ secrets.GC_PROJECT_ID }}"
+          service_account_key: "${{ secrets.GC_KEY }}"
+          export_default_credentials: true
 
-#      - run: |
-#          gcloud info
+      - run: |
+          gcloud info
 
-#      - name: 'Terraform Setup'
-#        uses: hashicorp/setup-terraform@v1
-#      - name: 'Terraform Init'
-#        run: terraform init deploy/
-#      - name: 'Terraform Plan'
-#        run: terraform plan -var-file deploy/prod.tfvars -out deploy/prod.out deploy/
-#      - name: 'Terraform Apply'
-#        run: terraform apply -auto-approve deploy/prod.out
+      - name: 'Terraform Setup'
+        uses: hashicorp/setup-terraform@v1
+
+      - name: 'Terraform Init'
+        run: terraform init deploy/
+
+      - name: 'Terraform Plan'
+        run: terraform plan -var-file deploy/prod.tfvars -out deploy/prod.out deploy/
+
+      - name: 'Terraform Apply'
+        run: terraform apply -auto-approve deploy/prod.out
