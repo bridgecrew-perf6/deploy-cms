@@ -53,6 +53,7 @@ POLICY
 provider "google" {
   project = "${var.GC_PROJECT_ID}"
   region      = var.region
+##  credentials = file("credentials.json")
 }
 
 ## Use the Google Secret Manager API for the database secrets
@@ -85,9 +86,6 @@ resource "google_sql_database_instance" "myinstance" {
   settings {
     tier = "db-f1-micro"
   }
-
-  ## this allows the database to be deleted on 'terraform destroy'
-  deletion_protection  = "false"
 }
 
 resource "google_sql_user" "users" {
@@ -110,6 +108,7 @@ resource "google_sql_database" "database" {
 resource "google_cloud_run_service" "website" {
   name     = "${var.IMAGE}"
   location = var.location
+  depends_on = [aws_s3_bucket.bucket, google_sql_database.database]
   template {
     spec {
       containers {
