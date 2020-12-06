@@ -1,4 +1,4 @@
-name: 'Deployment Pipeline'
+name: 'Infrastructure Provisioning on the Master Branch'
 on: 
   push:
     branches:
@@ -12,6 +12,7 @@ env:
   IMAGE: "${{ secrets.IMAGE_NAME }}"
   REGISTRY_HOSTNAME: gcr.io
   GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
+  TERRAFORM_BUILD_TYPE: "${{ secrets.TERRAFORM_BUILD_TYPE }}"
   ## Define variables for Terraform
   TF_VAR_GC_PROJECT_ID: "${{ secrets.GC_PROJECT_ID }}"
   TF_VAR_IMAGE: "${{ secrets.IMAGE_NAME }}"
@@ -91,13 +92,13 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: 'Terraform Init'
-        run: terraform init deploy/
+        run: terraform init "${{ secrets.TERRAFORM_BUILD_TYPE }}"
 
       - name: 'Terraform Plan'
-        run: terraform plan -var-file deploy/prod.tfvars -out deploy/prod.out deploy/
+        run: terraform plan -var-file deploy/"${{ secrets.TERRAFORM_BUILD_TYPE }}"/build.tfvars -out deploy/"${{ secrets.TERRAFORM_BUILD_TYPE }}"/build.out deploy/"${{ secrets.TERRAFORM_BUILD_TYPE }}"/
 
       - name: 'Terraform Apply'
-        run: terraform apply -auto-approve deploy/prod.out
+        run: terraform apply -auto-approve deploy/"${{ secrets.TERRAFORM_BUILD_TYPE }}"/build.out
 
 
 ## Optional Slack notification about pipeline end
