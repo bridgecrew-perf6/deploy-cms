@@ -1,3 +1,6 @@
+###################################
+## Declare environment variables ##
+###################################
 variable "GC_PROJECT_ID" {}
 variable "IMAGE" {}
 variable "AWS_SECRET_ACCESS_KEY" {}
@@ -7,6 +10,9 @@ variable "AWS_STORAGE_BUCKET_ARN1" {}
 variable "AWS_STORAGE_BUCKET_ARN2" {}
 
 
+#############################
+## Provision AWS S3 bucket ##
+#############################
 provider "aws" {
   region = "eu-west-2"
   access_key = var.AWS_ACCESS_KEY_ID
@@ -40,57 +46,67 @@ resource "aws_s3_bucket" "bucket" {
 POLICY
 }
 
-## Configure GCP project
+
+##########################################################
+## Provision PSQL instance and database on Google Cloud ##
+##########################################################
 provider "google" {
   project = "${var.GC_PROJECT_ID}"
   region      = var.region
 }
 
-## Use Google Secret Manager API for Database User/Password
+## Use the Google Secret Manager API for the database secrets
 data "google_secret_manager_secret_version" "database_instance_name" {
   secret  = "database_instance_name"
   version = "1"
 }
 
-#data "google_secret_manager_secret_version" "database_name" {
-#  secret  = "database_name"
-#  version = "1"
-#}
+data "google_secret_manager_secret_version" "database_name" {
+  secret  = "database_name"
+  version = "1"
+}
 
-#data "google_secret_manager_secret_version" "database_user" {
-#  secret  = "database_user"
-#  version = "1"
-#}
+data "google_secret_manager_secret_version" "database_user" {
+  secret  = "database_user"
+  version = "1"
+}
 
-#data "google_secret_manager_secret_version" "database_password" {
-#  secret  = "database_password"
-#  version = "1"
-#}
+data "google_secret_manager_secret_version" "database_password" {
+  secret  = "database_password"
+  version = "1"
+}
 
-## Provisioning a Postgres Database
-#resource "google_sql_database_instance" "myinstance" {
-#  name = data.google_secret_manager_secret_version.database_instance_name.secret_data
-#  region = var.region
-#  database_version = "POSTGRES_11"
+# Create a SQL instance and a PSQL database with user/password
+resource "google_sql_database_instance" "myinstance" {
+  name = data.google_secret_manager_secret_version.database_instance_name.secret_data
+  region = var.region
+  database_version = "POSTGRES_11"
 
-#  settings {
-#    tier = "db-f1-micro"
-#  }
-#}
+  settings {
+    tier = "db-f1-micro"
+  }
 
-#resource "google_sql_user" "users" {
-#  name     = data.google_secret_manager_secret_version.database_user.secret_data
-#  instance = google_sql_database_instance.myinstance.name
-#  password = data.google_secret_manager_secret_version.database_password.secret_data
-#}
+  ## this allows the database to be deleted on 'terraform destroy'
+  deletion_protection  = "false"
+}
 
-#resource "google_sql_database" "database" {
-#  name     = data.google_secret_manager_secret_version.database_name.secret_data
-#  instance = google_sql_database_instance.myinstance.name
-#}
+resource "google_sql_user" "users" {
+  name     = data.google_secret_manager_secret_version.database_user.secret_data
+  instance = google_sql_database_instance.myinstance.name
+  password = data.google_secret_manager_secret_version.database_password.secret_data
+}
+
+resource "google_sql_database" "database" {
+  name     = data.google_secret_manager_secret_version.database_name.secret_data
+  instance = google_sql_database_instance.myinstance.name
+}
 
 
-## Deploy image to Cloud Run
+###########################################
+## Run the container on Google Cloud Run ##
+###########################################
+
+## The container uses a GCR image created during the Github workflow (the previous step)
 resource "google_cloud_run_service" "website" {
   name     = "${var.IMAGE}"
   location = var.location
@@ -114,7 +130,6 @@ resource "google_cloud_run_service" "website" {
   }
 }
 
-## Create public access
 data "google_iam_policy" "noauth" {
   binding {
     role = "roles/run.invoker"
@@ -124,7 +139,6 @@ data "google_iam_policy" "noauth" {
   }
 }
 
-## Enable public access on Cloud Run service
 resource "google_cloud_run_service_iam_policy" "noauth" {
   location    = google_cloud_run_service.website.location
   project     = google_cloud_run_service.website.project
@@ -133,6 +147,7 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
 }
 
 
+## This outputs the container URL
 output "url" {
   value = google_cloud_run_service.website.status[0].url
 }
