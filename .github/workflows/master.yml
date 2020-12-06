@@ -92,7 +92,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: 'Terraform Init'
-        run: terraform init "${{ secrets.TERRAFORM_BUILD_TYPE }}"
+        run: terraform init deploy/"${{ secrets.TERRAFORM_BUILD_TYPE }}"/
 
       - name: 'Terraform Plan'
         run: terraform plan -var-file deploy/"${{ secrets.TERRAFORM_BUILD_TYPE }}"/build.tfvars -out deploy/"${{ secrets.TERRAFORM_BUILD_TYPE }}"/build.out deploy/"${{ secrets.TERRAFORM_BUILD_TYPE }}"/
